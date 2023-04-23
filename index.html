@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chrome Dinosaur Game</title>
+  <style>
+    canvas {
+      display: block;
+      margin: 0 auto;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="600" height="150"></canvas>
+
+  <script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var score = 0;
+    var highScore = localStorage.getItem('highScore') || 0;
+
+    var dino = {
+      x: 50,
+      y: 125,
+      width: 40,
+      height: 50,
+      draw: function() {
+        ctx.fillStyle = '#999999';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      }
+    };
+
+    var cactus = {
+      x: canvas.width,
+      y: 130,
+      width: 20,
+      height: 40,
+      speed: 3,
+      draw: function() {
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+      },
+      update: function() {
+        this.x -= this.speed;
+
+        if (this.x + this.width < 0) {
+          this.x = canvas.width;
+          score++;
+          if (score > highScore) {
+            localStorage.setItem('highScore', score);
+            highScore = score;
+          }
+          if (score === 1000) {
+            window.location.href = 'https://wizkid420.github.io';
+          }
+        }
+
+        if (this.x < dino.x + dino.width &&
+            this.x + this.width > dino.x &&
+            this.y < dino.y + dino.height &&
+            this.y + this.height > dino.y) {
+          score = 0;
+          this.x = canvas.width;
+        }
+      }
+    };
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      dino.draw();
+      cactus.draw();
+      cactus.update();
+      ctx.fillStyle = '#000000';
+      ctx.fillText('Score: ' + score, 10, 20);
+      ctx.fillText('High Score: ' + highScore, 10, 40);
+    }
+
+    setInterval(update, 10);
+
+    document.addEventListener('keydown', function(event) {
+      if (event.keyCode === 32 && dino.y === 125) {
+        dino.y -= 80;
+        setTimeout(function() {
+          dino.y += 80;
+        }, 500);
+      }
+    });
+  </script>
+</body>
+</html>
